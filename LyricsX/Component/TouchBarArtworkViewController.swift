@@ -23,15 +23,15 @@ import CombineX
 import MusicPlayer
 
 class TouchBarArtworkViewController: NSViewController {
-    
+
     let artworkView = NSImageView()
-    
+
     private var cancelBag = Set<AnyCancellable>()
-    
+
     override func loadView() {
         view = artworkView
     }
-    
+
     override func viewDidLoad() {
         defaultNC.cx.publisher(for: MusicPlayerController.currentTrackDidChangeNotification, object: AppController.shared.playerManager)
             .sink { [unowned self] _ in
@@ -39,7 +39,7 @@ class TouchBarArtworkViewController: NSViewController {
             }.store(in: &cancelBag)
         updateArtworkImage()
     }
-    
+
     func updateArtworkImage() {
         let player = AppController.shared.playerManager.player
         if let image = player?.currentTrack?.artwork ?? player?.icon {
@@ -53,7 +53,7 @@ class TouchBarArtworkViewController: NSViewController {
 }
 
 extension MusicPlayerController {
-    
+
     var icon: NSImage? {
         switch self {
         case is iTunes: return #imageLiteral(resourceName: "iTunes_icon")

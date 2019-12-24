@@ -23,25 +23,25 @@ import MusicPlayer
 import ServiceManagement
 
 class PreferenceGeneralViewController: NSViewController {
-    
+
     @IBOutlet weak var preferAuto: NSButton!
     @IBOutlet weak var preferiTunes: NSButton!
     @IBOutlet weak var preferSpotify: NSButton!
     @IBOutlet weak var preferVox: NSButton!
     @IBOutlet weak var preferAudirvana: NSButton!
-    
+
     @IBOutlet weak var autoLaunchButton: NSButton!
-    
+
     @IBOutlet weak var savingPathPopUp: NSPopUpButton!
     @IBOutlet weak var userPathMenuItem: NSMenuItem!
-    
+
     @IBOutlet weak var loadHomonymLrcButton: NSButton!
-    
+
     @IBOutlet weak var languagePopUp: NSPopUpButton!
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         switch defaults[.PreferredPlayerIndex] {
         case 0:
             preferiTunes.state = .on
@@ -57,14 +57,14 @@ class PreferenceGeneralViewController: NSViewController {
             preferAuto.state = .on
             autoLaunchButton.isEnabled = false
         }
-        
+
         if let url = defaults.lyricsCustomSavingPath {
             userPathMenuItem.title = url.lastPathComponent
             userPathMenuItem.toolTip = url.path
         } else {
             userPathMenuItem.isHidden = true
         }
-        
+
         for lan in supportedLanguages {
             let localized: String
             if let idx = lan.firstIndex(of: "-") {
@@ -79,19 +79,19 @@ class PreferenceGeneralViewController: NSViewController {
             }
         }
     }
-    
+
     @IBAction func toggleAutoLaunchAction(_ sender: NSButton) {
         let enabled = sender.state == .on
         if !SMLoginItemSetEnabled(lyricsXHelperIdentifier as CFString, enabled) {
             log("Failed to set login item enabled")
         }
     }
-    
+
     @IBAction func showInFinderAction(_ sender: Any) {
         let url = defaults.lyricsSavingPath().0
         NSWorkspace.shared.open(url)
     }
-    
+
     @IBAction func chooseSavingPathAction(_ sender: Any) {
         let openPanel = NSOpenPanel()
         openPanel.canChooseFiles = false
@@ -118,15 +118,15 @@ class PreferenceGeneralViewController: NSViewController {
         lans.insert(code, at: 0)
         defaults[.AppleLanguages] = lans
     }
-    
+
     @IBAction func helpTranslateAction(_ sender: NSButton) {
         NSWorkspace.shared.open(crowdinProjectURL)
     }
-    
+
     @IBAction func preferredPlayerAction(_ sender: NSButton) {
         defaults[.PreferredPlayerIndex] = sender.tag
         AppController.shared.playerManager.preferredPlayerName = MusicPlayerName(index: sender.tag)
-        
+
         if sender.tag < 0 {
             autoLaunchButton.isEnabled = false
             autoLaunchButton.state = .off
@@ -134,7 +134,7 @@ class PreferenceGeneralViewController: NSViewController {
         } else {
             autoLaunchButton.isEnabled = true
         }
-        
+
         if sender.tag == 1 || sender.tag == 3 {
             loadHomonymLrcButton.isEnabled = false
             loadHomonymLrcButton.state = .off
@@ -143,7 +143,7 @@ class PreferenceGeneralViewController: NSViewController {
             loadHomonymLrcButton.isEnabled = true
         }
     }
-    
+
 }
 
 let supportedLanguages = [
