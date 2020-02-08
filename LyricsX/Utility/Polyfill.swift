@@ -13,7 +13,7 @@ import Cocoa
 // MARK: - 10.12
 
 extension NSTextField {
-    
+
     @available(macOS, obsoleted: 10.12)
     convenience init(labelWithString stringValue: String) {
         self.init()
@@ -33,7 +33,7 @@ extension NSTextField {
 }
 
 extension NSAnimationContext {
-    
+
     @available(macOS, obsoleted: 10.12)
     class func runAnimationGroup(_ changes: (NSAnimationContext) -> Void) {
         runAnimationGroup(changes, completionHandler: nil)
@@ -43,7 +43,7 @@ extension NSAnimationContext {
 // MARK: - 10.13
 
 extension NSStoryboard {
-    
+
     @available(macOS, obsoleted: 10.13)
     class var main: NSStoryboard? {
         guard let mainStoryboardName = Bundle.main.infoDictionary?["NSMainStoryboardFile"] as? String else {

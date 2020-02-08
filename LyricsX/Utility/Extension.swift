@@ -11,7 +11,7 @@ import MusicPlayer
 import Regex
 
 extension MusicPlayerName {
-    
+
     init?(index: Int) {
         switch index {
         case 0: self = .appleMusic
@@ -22,7 +22,7 @@ extension MusicPlayerName {
         default: return nil
         }
     }
-    
+
     var icon: NSImage {
         switch self {
         case .appleMusic:   return #imageLiteral(resourceName: "iTunes_icon")
@@ -35,7 +35,7 @@ extension MusicPlayerName {
 }
 
 extension MusicTrack {
-    
+
     var lyrics: String? {
         guard let originalTrack = originalTrack,
             originalTrack.responds(to: Selector(("lyrics"))) else {
@@ -43,7 +43,7 @@ extension MusicTrack {
         }
         return originalTrack.value(forKey: "lyrics") as? String
     }
-    
+
     func setLyrics(_ lyrics: String) {
         guard let originalTrack = originalTrack,
             originalTrack.responds(to: Selector(("setLyrics:"))) else {
@@ -54,7 +54,7 @@ extension MusicTrack {
 }
 
 extension NSFont {
-    
+
     convenience init?(name fontName: String, size fontSize: CGFloat, fallback fallbackNames: [String]) {
         let cascadeList = fallbackNames.compactMap {
             NSFontDescriptor(name: $0, size: fontSize)
@@ -66,14 +66,14 @@ extension NSFont {
 }
 
 extension UserDefaults {
-    
+
     var desktopLyricsFont: NSFont {
         return NSFont(name: self[.DesktopLyricsFontName],
                       size: CGFloat(self[.DesktopLyricsFontSize]),
                       fallback: self[.DesktopLyricsFontNameFallback])
             ?? NSFont.systemFont(ofSize: CGFloat(self[.DesktopLyricsFontSize]))
     }
-    
+
     var lyricsWindowFont: NSFont {
         return NSFont(name: defaults[.LyricsWindowFontName],
                       size: CGFloat(defaults[.LyricsWindowFontSize]))
@@ -82,7 +82,7 @@ extension UserDefaults {
 }
 
 extension UserDefaults {
-    
+
     func lyricsSavingPath() -> (URL, security: Bool) {
         if self[.LyricsSavingPathPopUpIndex] != 0, let path = lyricsCustomSavingPath {
             return (path, true)
@@ -91,7 +91,7 @@ extension UserDefaults {
             return (URL(fileURLWithPath: userPath).appendingPathComponent("Music/LyricsX"), false)
         }
     }
-    
+
     var lyricsCustomSavingPath: URL? {
         get {
             guard let data = self[.LyricsCustomSavingPathBookmark] else {
@@ -115,11 +115,11 @@ extension UserDefaults {
             self[.LyricsCustomSavingPathBookmark] = try? newValue?.bookmarkData(options: [.withSecurityScope])
         }
     }
-    
+
 }
 
 extension Lyrics {
-    
+
     var fileName: String? {
         guard let title = metadata.title?.replacingOccurrences(of: "/", with: "&"),
             let artist = metadata.artist?.replacingOccurrences(of: "/", with: "&") else {
@@ -127,11 +127,11 @@ extension Lyrics {
         }
         return "\(title) - \(artist).lrcx"
     }
-    
+
 }
 
 extension Lyrics {
-    
+
     func persist() {
         let (url, security) = defaults.lyricsSavingPath()
         if security {
@@ -145,7 +145,7 @@ extension Lyrics {
             }
         }
         let fileManager = FileManager.default
-        
+
         do {
             var isDir: ObjCBool = false
             if fileManager.fileExists(atPath: url.path, isDirectory: &isDir) {
@@ -155,11 +155,11 @@ extension Lyrics {
             } else {
                 try fileManager.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
             }
-            
+
             guard let lrcFileURL = fileName.map(url.appendingPathComponent) else {
                 return
             }
-            
+
             if fileManager.fileExists(atPath: lrcFileURL.path) {
                 try fileManager.removeItem(at: lrcFileURL)
             }
@@ -174,14 +174,14 @@ extension Lyrics {
 }
 
 private extension NSPredicate {
-    
+
     static var lyricsPredicate: NSPredicate {
         _ = NSPredicate.observer
         return _lyricsPredicate
     }
-    
+
     private static var _lyricsPredicate: NSPredicate!
-    
+
     private static let observer = defaults.observe(.LyricsFilterKeys, options: [.new, .initial]) { _, change in
         let predicates = change.newValue.compactMap { (key: String) -> NSPredicate? in
             let isRegex = key.hasPrefix("/")
@@ -198,25 +198,25 @@ private extension NSPredicate {
 }
 
 extension Lyrics {
-    
+
     func filtrate() {
         filtrate(isIncluded: NSPredicate.lyricsPredicate)
     }
 }
 
 extension Lyrics {
-    
+
     var adjustedOffset: Int {
         return offset + defaults[.GlobalLyricsOffset]
     }
-    
+
     var adjustedTimeDelay: TimeInterval {
         return TimeInterval(adjustedOffset) / 1000
     }
 }
 
 extension NSImage {
-    
+
     func scaled(to size: NSSize) -> NSImage {
         return NSImage(size: size, flipped: false) { rect in
             let srcRect = NSRect(origin: .zero, size: self.size)

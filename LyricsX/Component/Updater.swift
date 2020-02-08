@@ -24,7 +24,7 @@ var remoteVersion: Semver? {
 }
 
 #if IS_FOR_MAS
-    
+
     func checkForMASReview(force: Bool = false) {
         if let buildTime = Bundle.main.infoDictionary?["LX_BUILD_TIME"] as? Double {
             let dt = Date().timeIntervalSince1970 - buildTime
@@ -44,7 +44,7 @@ var remoteVersion: Semver? {
             defaults[.isInMASReview] = local > remote
         }
     }
-    
+
 #endif
 
 struct GitHubResponse: Decodable {
@@ -52,7 +52,7 @@ struct GitHubResponse: Decodable {
     let tag_name: String
     let draft: Bool
     let prerelease: Bool
-    
+
     /*
     let url: URL
     let assets_url: URL
@@ -68,9 +68,9 @@ struct GitHubResponse: Decodable {
     let zipball_url: URL?
     let body: String
      */
-    
+
     // let assets: [Any]
-    
+
     struct Author: Decodable {
         /*
         let login: String
