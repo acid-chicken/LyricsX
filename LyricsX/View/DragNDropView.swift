@@ -12,31 +12,31 @@ protocol DragNDropDelegate: class {
 }
 
 class DragNDropView: NSView {
-    
+
     weak var dragDelegate: DragNDropDelegate?
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         registerForDraggedTypes([.string, .fileNames])
     }
-    
+
     override func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
         return .copy
     }
-    
+
     override func draggingUpdated(_ sender: NSDraggingInfo) -> NSDragOperation {
         return .copy
     }
-    
+
     override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
         let pboard = sender.draggingPasteboard
-        
+
         if pboard.types?.contains(.string) == true,
             let str = pboard.string(forType: .string) {
             dragDelegate?.dragFinished(content: str)
             return true
         }
-        
+
         do {
             if pboard.types?.contains(.fileNames) == true,
                 let files = pboard.propertyList(forType: .fileNames) as? [Any],
@@ -58,7 +58,7 @@ class DragNDropView: NSView {
             return false
         }
     }
-    
+
 }
 
 extension NSPasteboard.PasteboardType {

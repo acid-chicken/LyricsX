@@ -16,16 +16,16 @@ protocol ScrollLyricsViewDelegate: class {
 }
 
 class ScrollLyricsView: NSScrollView {
-    
+
     weak var delegate: ScrollLyricsViewDelegate?
-    
+
     private var textView: NSTextView {
         // swiftlint:disable:next force_cast
         return documentView as! NSTextView
     }
-    
+
     var fadeStripWidth: CGFloat = 24
-    
+
     @objc dynamic var textColor = #colorLiteral(red: 0.7540688515, green: 0.7540867925, blue: 0.7540771365, alpha: 1) {
         didSet {
             DispatchQueue.main.async {
@@ -37,7 +37,7 @@ class ScrollLyricsView: NSScrollView {
             }
         }
     }
-    
+
     @objc dynamic var highlightColor = #colorLiteral(red: 0.8866666667, green: 1, blue: 0.8, alpha: 1) {
         didSet {
             guard let highlightedRange = self.highlightedRange else { return }
@@ -46,18 +46,18 @@ class ScrollLyricsView: NSScrollView {
             }
         }
     }
-    
+
     @objc dynamic var fontName = "Helvetica" {
         didSet { updateFont() }
     }
-    
+
     @objc dynamic var fontSize: CGFloat = 12 {
         didSet { updateFont() }
     }
-    
+
     private var ranges: [(TimeInterval, NSRange)] = []
     private var highlightedRange: NSRange?
-    
+
     func setupTextContents(lyrics: Lyrics?) {
         guard let lyrics = lyrics else {
             ranges = []
@@ -65,12 +65,12 @@ class ScrollLyricsView: NSScrollView {
             highlightedRange = nil
             return
         }
-        
+
         var lrcContent = ""
         var newRanges: [(TimeInterval, NSRange)] = []
         let enabledLrc = lyrics.lines.filter({ $0.enabled && !$0.content.isEmpty })
         let languageCode = lyrics.metadata.translationLanguages.first
-        
+
         for line in enabledLrc {
             var lineStr = line.content
             if var trans = line.attachments.translation(languageCode: languageCode), defaults[.PreferBilingualLyrics],
@@ -102,19 +102,19 @@ class ScrollLyricsView: NSScrollView {
             ], range: range)
         needsLayout = true
     }
-    
+
     override func layout() {
         super.layout()
         updateFadeEdgeMask()
         updateEdgeInset()
     }
-    
+
     override func mouseUp(with event: NSEvent) {
         guard event.clickCount == 2 else {
             super.mouseUp(with: event)
             return
         }
-        
+
         let clickPoint = textView.convert(event.locationInWindow, from: nil)
         let clickRange = ranges.filter { _, range in
             let bounding = textView.layoutManager!.boundingRect(forGlyphRange: range, in: textView.textContainer!)
@@ -124,7 +124,7 @@ class ScrollLyricsView: NSScrollView {
             delegate?.doubleClickLyricsLine(at: position)
         }
     }
-    
+
     override func scrollWheel(with event: NSEvent) {
         super.scrollWheel(with: event)
         switch event.momentumPhase {
@@ -136,12 +136,12 @@ class ScrollLyricsView: NSScrollView {
             break
         }
     }
-    
+
     // overriding scrollwheel method breaks trackpad responsive scrolling ability
     override class var isCompatibleWithResponsiveScrolling: Bool {
         return true
     }
-    
+
     private func updateFadeEdgeMask() {
         let location = fadeStripWidth / frame.height
         wantsLayer = true
@@ -153,12 +153,12 @@ class ScrollLyricsView: NSScrollView {
             $0.endPoint = CGPoint(x: 0, y: 1)
         }
     }
-    
+
     private func updateEdgeInset() {
         guard !ranges.isEmpty else {
             return
         }
-        
+
         let bounding1 = textView.layoutManager!.boundingRect(forGlyphRange: ranges.first!.1, in: textView.textContainer!)
         let topInset = frame.height / 2 - bounding1.height / 2
         let bounding2 = textView.layoutManager!.boundingRect(forGlyphRange: ranges.last!.1, in: textView.textContainer!)
@@ -166,12 +166,12 @@ class ScrollLyricsView: NSScrollView {
         automaticallyAdjustsContentInsets = false
         contentInsets = NSEdgeInsets(top: topInset, left: 0, bottom: bottomInset, right: 0)
     }
-    
+
     func highlight(position: TimeInterval) {
         guard !ranges.isEmpty else {
             return
         }
-        
+
         var left = ranges.startIndex
         var right = ranges.endIndex - 1
         while left <= right {
@@ -183,22 +183,22 @@ class ScrollLyricsView: NSScrollView {
             }
         }
         let range = ranges[right.clamped(to: ranges.indices)].1
-        
+
         if highlightedRange == range {
             return
         }
-        
+
         highlightedRange.map { textView.textStorage?.addAttribute(.foregroundColor, value: textColor, range: $0) }
         textView.textStorage?.addAttribute(.foregroundColor, value: highlightColor, range: range)
-        
+
         highlightedRange = range
     }
-    
+
     func scroll(position: TimeInterval) {
         guard !ranges.isEmpty else {
             return
         }
-        
+
         var left = ranges.startIndex
         var right = ranges.endIndex - 1
         while left <= right {
@@ -210,17 +210,17 @@ class ScrollLyricsView: NSScrollView {
             }
         }
         let range = ranges[right.clamped(to: ranges.indices)].1
-        
+
         let bounding = textView.layoutManager!.boundingRect(forGlyphRange: range, in: textView.textContainer!)
-        
+
         let point = NSPoint(x: 0, y: bounding.midY - frame.height / 2)
         textView.scroll(point)
     }
-    
+
     func updateFont() {
         let range = textView.string.fullRange
         let font = NSFont(name: fontName, size: fontSize)!
         textView.textStorage?.addAttribute(.font, value: font, range: range)
     }
-    
+
 }

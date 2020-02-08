@@ -10,7 +10,7 @@ import Foundation
 // MARK: - CFStringTokenizer
 
 extension NSString {
-    
+
     var dominantLanguage: String? {
         let cfStr = self as CFString
         return CFStringTokenizerCopyBestStringLanguage(cfStr, cfStr.fullRange) as String?
@@ -18,7 +18,7 @@ extension NSString {
 }
 
 extension CFStringTokenizer {
-    
+
     func currentFuriganaAnnotation(in string: NSString) -> (NSString, NSRange)? {
         let range = currentTokenRange()
         let tokenStr = string.substring(with: range.asNS)
@@ -47,7 +47,7 @@ private func rangeOfUncommonContent(_ s1: String, _ s2: String) -> (Range<String
         }
         (l1, l2) = (nl1, nl2)
     }
-    
+
     var (r1, r2) = (s1.endIndex, s2.endIndex)
     repeat {
         guard let nr1 = s1.index(r1, offsetBy: -1, limitedBy: s1.startIndex),
@@ -56,7 +56,7 @@ private func rangeOfUncommonContent(_ s1: String, _ s2: String) -> (Range<String
         }
         (r1, r2) = (nr1, nr2)
     } while s1[r1] == s2[r2]
-    
+
     let range1 = (l1...r1).relative(to: s1.indices)
     let range2 = (l2...r2).relative(to: s2.indices)
     return (range1, range2)

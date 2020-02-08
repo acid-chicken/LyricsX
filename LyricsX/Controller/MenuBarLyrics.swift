@@ -13,14 +13,14 @@ import MusicPlayer
 import OpenCC
 
 class MenuBarLyrics: NSObject {
-    
+
     static let shared = MenuBarLyrics()
-    
+
     let statusItem: NSStatusItem
     var lyricsItem: NSStatusItem?
     var buttonImage = #imageLiteral(resourceName: "status_bar_icon")
     var buttonlength: CGFloat = 30
-    
+
     private var screenLyrics = "" {
         didSet {
             DispatchQueue.main.async {
@@ -28,9 +28,9 @@ class MenuBarLyrics: NSObject {
             }
         }
     }
-    
+
     private var cancelBag = Set<AnyCancellable>()
-    
+
     private override init() {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         super.init()
@@ -44,7 +44,7 @@ class MenuBarLyrics: NSObject {
         observeNotification(center: workspaceNC, name: NSWorkspace.didActivateApplicationNotification) { [unowned self] _ in self.updateStatusItem() }
         observeDefaults(keys: [.MenuBarLyricsEnabled, .CombinedMenubarLyrics], options: [.initial]) { [unowned self] in self.updateStatusItem() }
     }
-    
+
     private func handleLyricsDisplay(lyrics: Lyrics?, index: Int?) {
         guard !defaults[.DisableLyricsWhenPaused] || selectedPlayer.playbackState.isPlaying,
             let lyrics = lyrics,
@@ -61,39 +61,39 @@ class MenuBarLyrics: NSObject {
         }
         screenLyrics = newScreenLyrics
     }
-    
+
     @objc private func updateStatusItem() {
         guard defaults[.MenuBarLyricsEnabled], !screenLyrics.isEmpty else {
             setImageStatusItem()
             lyricsItem = nil
             return
         }
-        
+
         if defaults[.CombinedMenubarLyrics] {
             updateCombinedStatusLyrics()
         } else {
             updateSeparateStatusLyrics()
         }
     }
-    
+
     private func updateSeparateStatusLyrics() {
         setImageStatusItem()
-        
+
         if lyricsItem == nil {
             lyricsItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
             lyricsItem?.highlightMode = false
         }
         lyricsItem?.title = screenLyrics
     }
-    
+
     private func updateCombinedStatusLyrics() {
         lyricsItem = nil
-        
+
         setTextStatusItem(string: screenLyrics)
         if statusItem.isVisibe {
             return
         }
-        
+
         // truncation
         var components = screenLyrics.components(options: [.byWords])
         while !components.isEmpty, !statusItem.isVisibe {
@@ -102,13 +102,13 @@ class MenuBarLyrics: NSObject {
             setTextStatusItem(string: proposed)
         }
     }
-    
+
     private func setTextStatusItem(string: String) {
         statusItem.title = string
         statusItem.image = nil
         statusItem.length = NSStatusItem.variableLength
     }
-    
+
     private func setImageStatusItem() {
         statusItem.title = ""
         statusItem.image = buttonImage
@@ -119,29 +119,29 @@ class MenuBarLyrics: NSObject {
 // MARK: - Status Item Visibility
 
 private extension NSStatusItem {
-    
+
     var isVisibe: Bool {
         guard let buttonFrame = button?.frame,
             let frame = button?.window?.convertToScreen(buttonFrame) else {
                 return false
         }
-        
+
         let point = CGPoint(x: frame.midX, y: frame.midY)
         guard let screen = NSScreen.screens.first(where: { $0.frame.contains(point) }) else {
             return false
         }
         let carbonPoint = CGPoint(x: point.x, y: screen.frame.height - point.y - 1)
-        
+
         guard let element = AXUIElement.copyAt(position: carbonPoint) else {
             return false
         }
-        
+
         return getpid() == element.pid
     }
 }
 
 private extension AXUIElement {
-    
+
     static func copyAt(position: NSPoint) -> AXUIElement? {
         var element: AXUIElement?
         let error = AXUIElementCopyElementAtPosition(AXUIElementCreateSystemWide(), Float(position.x), Float(position.y), &element)
@@ -150,7 +150,7 @@ private extension AXUIElement {
         }
         return element
     }
-    
+
     var pid: pid_t? {
         var pid: pid_t = 0
         let error = AXUIElementGetPid(self, &pid)
@@ -162,7 +162,7 @@ private extension AXUIElement {
 }
 
 private extension String {
-    
+
     func components(options: String.EnumerationOptions) -> [String] {
         var components: [String] = []
         let range = Range(uncheckedBounds: (startIndex, endIndex))

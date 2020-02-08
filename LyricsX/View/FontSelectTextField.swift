@@ -9,25 +9,25 @@ import Cocoa
 import SnapKit
 
 protocol FontSelectTextFieldDelegate: class {
-    
+
     func fontChanged(from oldFont: NSFont, to newFont: NSFont, sender: FontSelectTextField)
 }
 
 class FontSelectTextField: NSTextField, NSWindowDelegate {
-    
+
     weak var fontChangeDelegate: FontSelectTextFieldDelegate?
-    
+
     @objc dynamic var selectedFont = NSFont.systemFont(ofSize: NSFont.systemFontSize) {
         didSet {
             stringValue = "\(selectedFont.fontName) - \(Int(selectedFont.pointSize))"
         }
     }
-    
+
     override var isEditable: Bool {
         get { return false }
         set {}
     }
-    
+
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         _ = FontSelectTextField.swizzler
@@ -46,7 +46,7 @@ class FontSelectTextField: NSTextField, NSWindowDelegate {
             make.bottom.right.equalToSuperview().offset(-1)
         }
     }
-    
+
     deinit {
         let fontManger = NSFontManager.shared
         if fontManger.target === self {
@@ -54,7 +54,7 @@ class FontSelectTextField: NSTextField, NSWindowDelegate {
             NSFontPanel.shared.close()
         }
     }
-    
+
     @objc private func showFontPanel(_ sender: NSButton) {
         let fontManger = NSFontManager.shared
         fontManger.target = self
@@ -63,7 +63,7 @@ class FontSelectTextField: NSTextField, NSWindowDelegate {
         fontPanel?.delegate = self
         fontPanel?.makeKeyAndOrderFront(self)
     }
-    
+
     @objc func changeFont(_ sender: Any?) {
         guard let manager = sender as? NSFontManager else {
             return
@@ -72,11 +72,11 @@ class FontSelectTextField: NSTextField, NSWindowDelegate {
         fontChangeDelegate?.fontChanged(from: selectedFont, to: newFont, sender: self)
         selectedFont = newFont
     }
-    
+
     @objc private func dummyValidModesForFontPanel(_ fontPanel: NSFontPanel) -> UInt32 {
         return NSFontPanelSizeModeMask | NSFontPanelCollectionModeMask | NSFontPanelFaceModeMask
     }
-    
+
     private static let swizzler: Void = {
         let cls = FontSelectTextField.self
         let sel = Selector(("validModesForFontPanel"))

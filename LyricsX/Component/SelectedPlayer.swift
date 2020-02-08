@@ -11,19 +11,19 @@ import GenericID
 import CombineX
 
 extension MusicPlayers {
-    
+
     final class Selected: Delegate {
-        
+
         static let shared = MusicPlayers.Selected()
-        
+
         private var defaultsObservation: DefaultsObservation?
-        
+
         var manualUpdateInterval: TimeInterval = 1.0 {
             didSet {
                 scheduleManualUpdate()
             }
         }
-        
+
         override init() {
             super.init()
             selectPlayer()
@@ -32,7 +32,7 @@ extension MusicPlayers {
                 self?.selectPlayer()
             }
         }
-        
+
         private func selectPlayer() {
             let idx = defaults[.PreferredPlayerIndex]
             if idx == -1 {
@@ -46,7 +46,7 @@ extension MusicPlayers {
                 designatedPlayer = MusicPlayerName(index: idx).flatMap(MusicPlayers.Scriptable.init)
             }
         }
-        
+
         private var scheduleCanceller: Cancellable?
         func scheduleManualUpdate() {
             scheduleCanceller?.cancel()

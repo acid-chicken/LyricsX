@@ -9,7 +9,7 @@ import Foundation
 import LyricsCore
 
 private extension NSCountedSet {
-    
+
     var mostFrequentElement: Any? {
         var result: (Any?, Int) = (nil, 0)
         for element in self {
@@ -23,7 +23,7 @@ private extension NSCountedSet {
 }
 
 extension Lyrics {
-    
+
     func recognizeLanguage() {
         let lyricsLanguageSet = NSCountedSet()
         let translationLanguageSet = NSCountedSet()

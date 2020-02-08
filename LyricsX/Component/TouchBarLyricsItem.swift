@@ -12,23 +12,23 @@ import OpenCC
 
 @available(OSX 10.12.2, *)
 class TouchBarLyricsItem: NSCustomTouchBarItem {
-    
+
     private var lyricsTextField = KaraokeLabel(labelWithString: "")
-    
+
     @objc dynamic var progressColor = #colorLiteral(red: 0, green: 1, blue: 0.8333333333, alpha: 1)
-    
+
     private var cancelBag = Set<AnyCancellable>()
-    
+
     override init(identifier: NSTouchBarItem.Identifier) {
         super.init(identifier: identifier)
         commonInit()
     }
-    
+
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         commonInit()
     }
-    
+
     func commonInit() {
         view = lyricsTextField
         customizationLabel = "Lyrics"
@@ -40,7 +40,7 @@ class TouchBarLyricsItem: NSCustomTouchBarItem {
             }
             .store(in: &cancelBag)
     }
-    
+
     private func handleLyricsDisplay(lyrics: Lyrics?, index: Int?) {
         guard let lyrics = lyrics,
             let index = index else {

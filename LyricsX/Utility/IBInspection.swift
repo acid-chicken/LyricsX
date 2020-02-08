@@ -10,7 +10,7 @@ import Cocoa
 // These trait can be customized with Interface Builder.
 
 extension NSMenuItem {
-    
+
     @IBInspectable
     var isHiddenInMASVersion: Bool {
         get { return true }
@@ -22,7 +22,7 @@ extension NSMenuItem {
             #endif
         }
     }
-    
+
     @IBInspectable
     var isHiddenDuringMASReview: Bool {
         get { return true }
@@ -37,7 +37,7 @@ extension NSMenuItem {
 }
 
 extension NSView {
-    
+
     @IBInspectable
     var isRemovedDuringMASReview: Bool {
         get { return true }

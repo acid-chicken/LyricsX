@@ -6,13 +6,16 @@
 
 <img src="docs/img/icon.png" width="128px">
 
-LyricsX is a plugin for iTunes, Spotify and Vox, which auto search and download lyrics for the current playing from Internet, and displays them in the desktop and menubar.
+LyricsX is a plugin for iTunes, Spotify and Vox, which auto search and download
+lyrics for the current playing from Internet, and displays them in the desktop
+and menubar.
 
 ## LyricsX for iOS
 
 LyricsX for iOS is in beta stage.
 
-[Install via TestFlight](https://testflight.apple.com/join/pjjhQLZJ), and join the [Telegram group](https://telegram.me/LyricsXApp).
+[Install via TestFlight](https://testflight.apple.com/join/pjjhQLZJ), and join
+the [Telegram group](https://telegram.me/LyricsXApp).
 
 ## Installation
 
@@ -28,9 +31,11 @@ LyricsX is available on the Mac App Store.
 
 - Work perfectly with iTunes, Spotify and Vox.
 - Automatically search & download live lyrics.
-- Display lyrics on desktop and menubar. you can customize font, color and position.
+- Display lyrics on desktop and menubar. you can customize font, color and
+  position.
 - Adjust lyrics offset on status menu.
-- Navigate the song with lyrics - Double click a line to jump to specific position.
+- Navigate the song with lyrics - Double click a line to jump to specific
+  position.
 - Drag & Drop to import/export lyrics file.
 - Auto launch & quit with music player.
 - Automatic conversion between Traditional Chinese and Simplified Chinese.
@@ -78,7 +83,6 @@ LyricsX is available on the Mac App Store.
 #### Special Thanks
 
 - [Lyrics Project](https://github.com/MichaelRow/Lyrics)
-
 
 ## ⚠️ Disclaimer
 
