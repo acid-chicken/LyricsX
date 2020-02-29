@@ -15,13 +15,13 @@ import SnapKit
 import SwiftCF
 
 class KaraokeLyricsWindowController: NSWindowController {
-    
+
     static private let windowFrame = NSWindow.FrameAutosaveName("KaraokeWindow")
-    
+
     private var lyricsView = KaraokeLyricsView(frame: .zero)
-    
+
     private var cancelBag = Set<AnyCancellable>()
-    
+
     init() {
         let window = NSWindow(contentRect: .zero, styleMask: .borderless, backing: .buffered, defer: true)
         window.backgroundColor = .clear
@@ -31,14 +31,14 @@ class KaraokeLyricsWindowController: NSWindowController {
         window.collectionBehavior = [.canJoinAllSpaces, .stationary]
         window.setFrameUsingName(KaraokeLyricsWindowController.windowFrame, force: true)
         super.init(window: window)
-        
+
         window.contentView?.addSubview(lyricsView)
-        
+
         addObserver()
         makeConstraints()
-        
+
         updateWindowFrame(animate: false)
-        
+
         lyricsView.displayLrc("LyricsX")
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
             self.lyricsView.displayLrc("")
@@ -62,11 +62,11 @@ class KaraokeLyricsWindowController: NSWindowController {
             }
         }
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     private func addObserver() {
         lyricsView.bind(\.textColor, withDefaultName: .desktopLyricsColor)
         lyricsView.bind(\.progressColor, withDefaultName: .desktopLyricsProgressColor)
@@ -74,10 +74,10 @@ class KaraokeLyricsWindowController: NSWindowController {
         lyricsView.bind(\.backgroundColor, withDefaultName: .desktopLyricsBackgroundColor)
         lyricsView.bind(\.isVertical, withDefaultName: .desktopLyricsVerticalMode, options: [.nullPlaceholder: false])
         lyricsView.bind(\.drawFurigana, withDefaultName: .desktopLyricsEnableFurigana)
-        
+
         let negateOption = [NSBindingOption.valueTransformerName: NSValueTransformerName.negateBooleanTransformerName]
         window?.contentView?.bind(.hidden, withDefaultName: .desktopLyricsEnabled, options: negateOption)
-        
+
         observeDefaults(key: .disableLyricsWhenSreenShot, options: [.new, .initial]) { [unowned self] _, change in
             self.window?.sharingType = change.newValue ? .none : .readOnly
         }
@@ -94,7 +94,7 @@ class KaraokeLyricsWindowController: NSWindowController {
         ], options: [.initial]) { [unowned self] in
             self.lyricsView.font = defaults.desktopLyricsFont
         }
-        
+
         observeNotification(name: NSApplication.didChangeScreenParametersNotification, queue: .main) { [unowned self] _ in
             self.updateWindowFrame(animate: true)
         }
@@ -102,14 +102,14 @@ class KaraokeLyricsWindowController: NSWindowController {
             self.updateWindowFrame(animate: true)
         }
     }
-    
+
     private func updateWindowFrame(toScreen: NSScreen? = nil, animate: Bool) {
         let screen = toScreen ?? window?.screen ?? NSScreen.screens[0]
         let frame = screen.isFullScreen ? screen.frame : screen.visibleFrame
         window?.setFrame(frame, display: false, animate: animate)
         window?.saveFrame(usingName: KaraokeLyricsWindowController.windowFrame)
     }
-    
+
     @objc private func handleLyricsDisplay() {
         guard defaults[.desktopLyricsEnabled],
             !defaults[.disableLyricsWhenPaused] || selectedPlayer.playbackState.isPlaying,
@@ -120,12 +120,12 @@ class KaraokeLyricsWindowController: NSWindowController {
                 }
                 return
         }
-        
+
         let lrc = lyrics.lines[index]
         let next = lyrics.lines[(index + 1)...].first { $0.enabled }
-        
+
         let languageCode = lyrics.metadata.translationLanguages.first
-        
+
         var firstLine = lrc.content
         var secondLine: String
         var secondLineIsTranslation = false
@@ -138,7 +138,7 @@ class KaraokeLyricsWindowController: NSWindowController {
         } else {
             secondLine = next?.content ?? ""
         }
-        
+
         if let converter = ChineseConverter.shared {
             if lyrics.metadata.language?.hasPrefix("zh") == true {
                 firstLine = converter.convert(firstLine)
@@ -150,7 +150,7 @@ class KaraokeLyricsWindowController: NSWindowController {
                 secondLine = converter.convert(secondLine)
             }
         }
-        
+
         DispatchQueue.main.async {
             self.lyricsView.displayLrc(firstLine, secondLine: secondLine)
             if let upperTextField = self.lyricsView.displayLine1,
@@ -165,7 +165,7 @@ class KaraokeLyricsWindowController: NSWindowController {
             }
         }
     }
-    
+
     private func makeConstraints() {
         lyricsView.snp.remakeConstraints { make in
             make.centerX.equalToSuperview().safeMultipliedBy(defaults[.desktopLyricsXPositionFactor] * 2).priority(.low)
@@ -176,16 +176,16 @@ class KaraokeLyricsWindowController: NSWindowController {
             make.bottom.lessThanOrEqualToSuperview()
         }
     }
-    
+
     // MARK: Dragging
-    
+
     private var vecToCenter: CGVector?
-    
+
     override func mouseDown(with event: NSEvent) {
         let location = lyricsView.convert(event.locationInWindow, from: nil)
         vecToCenter = CGVector(from: location, to: lyricsView.bounds.center)
     }
-    
+
     override func mouseDragged(with event: NSEvent) {
         guard defaults[.desktopLyricsDraggable],
             let vecToCenter = vecToCenter,
@@ -201,7 +201,7 @@ class KaraokeLyricsWindowController: NSWindowController {
             center = window.convertFromScreen(CGRect(origin: centerInScreen, size: .zero)).origin
             return
         }
-        
+
         var xFactor = (center.x / bounds.width).clamped(to: 0...1)
         var yFactor = (1 - center.y / bounds.height).clamped(to: 0...1)
         if abs(center.x - bounds.width / 2) < 8 {
@@ -215,11 +215,11 @@ class KaraokeLyricsWindowController: NSWindowController {
         makeConstraints()
         window.layoutIfNeeded()
     }
-    
+
 }
 
 private extension NSScreen {
-    
+
     var isFullScreen: Bool {
         guard let windowInfoList = CGWindowListCopyWindowInfo(.optionOnScreenOnly, kCGNullWindowID) as? [[String: Any]] else {
             return false
@@ -237,7 +237,7 @@ private extension NSScreen {
 }
 
 private extension ConstraintMakerEditable {
-    
+
     @discardableResult
     func safeMultipliedBy(_ amount: ConstraintMultiplierTarget) -> ConstraintMakerEditable {
         var factor = amount.constraintMultiplierTargetValue

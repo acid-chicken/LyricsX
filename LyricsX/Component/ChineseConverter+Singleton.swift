@@ -8,14 +8,14 @@
 import OpenCC
 
 extension ChineseConverter {
-    
+
     static var shared: ChineseConverter? {
         _ = ChineseConverter.observer
         return _shared
     }
-    
+
     private static var _shared: ChineseConverter?
-    
+
     private static let observer = defaults.observe(.chineseConversionIndex, options: [.new, .initial]) { _, change in
         switch change.newValue {
         case 1: ChineseConverter._shared = try! ChineseConverter(option: [.simplify])

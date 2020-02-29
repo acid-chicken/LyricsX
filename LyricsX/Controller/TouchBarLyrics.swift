@@ -12,10 +12,10 @@ import OpenCC
 
 @available(OSX 10.12.2, *)
 class TouchBarSystemModalController: NSObject, NSTouchBarDelegate {
-    
+
     var touchBar: NSTouchBar?
     var systemTrayItem: NSCustomTouchBarItem?
-    
+
     override init() {
         super.init()
         loadTouchBar()
@@ -23,41 +23,41 @@ class TouchBarSystemModalController: NSObject, NSTouchBarDelegate {
         touchBarDidLoad()
         showInControlStrip()
     }
-    
+
     /// customization point
     func loadTouchBar() {
         if touchBar == nil {
             touchBar = NSTouchBar()
         }
     }
-    
+
     /// customization point
     func touchBarDidLoad() {
-        
+
     }
-    
+
     @objc func showInControlStrip() {
         NSTouchBar.setSystemModalShowsCloseBoxWhenFrontMost(false)
         systemTrayItem?.addToSystemTray()
         systemTrayItem?.setControlStripPresence(true)
     }
-    
+
     @objc func removeFromControlStrip() {
         dismiss()
         systemTrayItem?.setControlStripPresence(false)
         systemTrayItem?.removeFromSystemTray()
     }
-    
+
     @objc func present() {
         if let touchBar = self.touchBar, let systemTrayItem = self.systemTrayItem {
             touchBar.presentAsSystemModal(for: systemTrayItem)
         }
     }
-    
+
     @objc func minimize() {
         touchBar?.minimizeSystemModal()
     }
-    
+
     @objc func dismiss() {
         touchBar?.dismissSystemModal()
     }
@@ -65,19 +65,19 @@ class TouchBarSystemModalController: NSObject, NSTouchBarDelegate {
 
 @available(OSX 10.12.2, *)
 class TouchBarLyrics: TouchBarSystemModalController {
-    
+
     private var lyricsItem = TouchBarLyricsItem(identifier: .lyrics)
-    
+
     override func touchBarDidLoad() {
         touchBar?.defaultItemIdentifiers = [.currentArtwork, .fixedSpaceSmall, .playbackControl, .fixedSpaceSmall, .lyrics, .flexibleSpace, .otherItemsProxy]
         touchBar?.customizationIdentifier = .main
         touchBar?.customizationAllowedItemIdentifiers = [.currentArtwork, .playbackControl, .lyrics, .fixedSpaceSmall, .fixedSpaceLarge, .flexibleSpace, .otherItemsProxy]
-        
+
         systemTrayItem = NSCustomTouchBarItem(identifier: .systemTrayItem)
         systemTrayItem?.view = NSButton(image: #imageLiteral(resourceName: "status_bar_icon"), target: self, action: #selector(present))
-        
+
         lyricsItem.bind(\.progressColor, withUnmatchedDefaultName: .desktopLyricsProgressColor)
-        
+
         self.observeNotification(name: NSApplication.willBecomeActiveNotification) { [weak self] _ in
             guard let self = self else { return }
             self.removeFromControlStrip()
@@ -85,7 +85,7 @@ class TouchBarLyrics: TouchBarSystemModalController {
                 NSApp.touchBar = self.touchBar
             }
         }
-        
+
         self.observeNotification(name: NSApplication.didResignActiveNotification) { [weak self] _ in
             guard let self = self else { return }
             NSApp.touchBar = nil
@@ -94,7 +94,7 @@ class TouchBarLyrics: TouchBarSystemModalController {
             }
         }
     }
-    
+
     func touchBar(_ touchBar: NSTouchBar, makeItemForIdentifier identifier: NSTouchBarItem.Identifier) -> NSTouchBarItem? {
         switch identifier {
         case .lyrics:
@@ -117,11 +117,11 @@ class TouchBarLyrics: TouchBarSystemModalController {
 
 @available(OSX 10.12.2, *)
 private extension NSTouchBarItem.Identifier {
-    
+
     static let lyrics = NSTouchBarItem.Identifier("ddddxxx.LyricsX.touchBar.lyrics")
     static let currentArtwork = NSTouchBarItem.Identifier("ddddxxx.LyricsX.touchBar.currentArtwork")
     static let playbackControl = NSTouchBarItem.Identifier("ddddxxx.LyricsX.touchBar.playbackControl")
-    
+
     static let systemTrayItem = NSTouchBarItem.Identifier("ddddxxx.LyricsX.touchBar.systemTrayItem")
 }
 

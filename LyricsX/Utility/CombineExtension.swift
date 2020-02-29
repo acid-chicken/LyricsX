@@ -8,7 +8,7 @@
 import CXShim
 
 extension Publisher {
-    
+
     func signal() -> Publishers.Map<Self, Void> {
         return self.map { _ in Void() }
     }

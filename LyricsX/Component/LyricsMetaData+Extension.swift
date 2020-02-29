@@ -17,32 +17,32 @@ extension Lyrics.MetaData.Key {
 }
 
 extension Lyrics.MetaData {
-    
+
     var localURL: URL? {
         get { return data[.localURL] as? URL }
         set { data[.localURL] = newValue }
     }
-    
+
     var title: String? {
         get { return request?.title ?? data[.title] as? String }
         set { data[.title] = newValue }
     }
-    
+
     var artist: String? {
         get { return request?.artist ?? data[.artist] as? String }
         set { data[.artist] = newValue }
     }
-    
+
     var needsPersist: Bool {
         get { return data[.needsPersist] as? Bool ?? false }
         set { data[.needsPersist] = newValue }
     }
-    
+
     var language: String? {
         get { return data[.language] as? String }
         set { data[.language] = newValue }
     }
-    
+
     var translationLanguages: [String] {
         return attachmentTags.compactMap { $0.translationLanguageCode }
     }

@@ -8,13 +8,13 @@
 import Cocoa
 
 class PreferenceDisplayViewController: NSViewController, FontSelectTextFieldDelegate {
-    
+
     @IBOutlet weak var karaokeFontSelectField: FontSelectTextField!
     @IBOutlet weak var hudFontSelectField: FontSelectTextField!
-    
+
     @IBOutlet weak var fontFallbackLabel: NSTextField!
     @IBOutlet weak var removeFontFallbackButton: NSButton!
-    
+
     override func viewDidLoad() {
         karaokeFontSelectField.selectedFont = defaults.desktopLyricsFont
         karaokeFontSelectField.fontChangeDelegate = self
@@ -23,7 +23,7 @@ class PreferenceDisplayViewController: NSViewController, FontSelectTextFieldDele
         updateScreenFontFallback()
         super.viewDidLoad()
     }
-    
+
     func updateScreenFontFallback() {
         guard let fallback = defaults[.desktopLyricsFontNameFallback].first else {
             fontFallbackLabel.isHidden = true
@@ -35,12 +35,12 @@ class PreferenceDisplayViewController: NSViewController, FontSelectTextFieldDele
         let format = NSLocalizedString("Font Fallback: %@", comment: "")
         fontFallbackLabel.stringValue = String(format: format, arguments: [fallback])
     }
-    
+
     @IBAction func removeFontFallbackAction(_ sender: Any) {
         defaults[.desktopLyricsFontNameFallback].removeAll()
         updateScreenFontFallback()
     }
-    
+
     func fontChanged(from oldFont: NSFont, to newFont: NSFont, sender: FontSelectTextField) {
         if sender === karaokeFontSelectField {
             defaults[.desktopLyricsFontName] = newFont.fontName
@@ -64,12 +64,12 @@ class PreferenceDisplayViewController: NSViewController, FontSelectTextFieldDele
 }
 
 class AlphaColorWell: NSColorWell {
-    
+
     override func activate(_ exclusive: Bool) {
         NSColorPanel.shared.showsAlpha = true
         super.activate(exclusive)
     }
-    
+
     override func deactivate() {
         super.deactivate()
         NSColorPanel.shared.showsAlpha = false

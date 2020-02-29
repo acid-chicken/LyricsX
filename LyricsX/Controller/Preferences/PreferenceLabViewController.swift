@@ -8,9 +8,9 @@
 import Cocoa
 
 class PreferenceLabViewController: NSViewController {
-    
+
     @IBOutlet weak var enableTouchBarLyricsButton: NSButton!
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         #if IS_FOR_MAS
@@ -20,7 +20,7 @@ class PreferenceLabViewController: NSViewController {
             enableTouchBarLyricsButton.bind(.value, withDefaultName: .touchBarLyricsEnabled)
         #endif
     }
-    
+
     @IBAction func mas_enableTouchBarLyricsAction(_ sender: NSButton) {
         sender.state = .off
         let alert = NSAlert()
@@ -40,7 +40,7 @@ class PreferenceLabViewController: NSViewController {
             handler(alert.runModal())
         }
     }
-    
+
     @IBAction func customizeTouchBarAction(_ sender: NSButton) {
         if #available(OSX 10.12.2, *) {
             NSApplication.shared.toggleTouchBarCustomizationPalette(sender)
