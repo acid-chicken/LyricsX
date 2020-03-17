@@ -9,45 +9,45 @@ import Cocoa
 import SwiftCF
 
 class KaraokeLabel: NSTextField {
-    
+
     @objc dynamic var isVertical = false {
         didSet {
             clearCache()
             invalidateIntrinsicContentSize()
         }
     }
-    
+
     @objc dynamic var drawFurigana = false {
         didSet {
             clearCache()
             invalidateIntrinsicContentSize()
         }
     }
-    
+
     override var attributedStringValue: NSAttributedString {
         didSet {
             clearCache()
         }
     }
-    
+
     override var stringValue: String {
         didSet {
             clearCache()
         }
     }
-    
+
     @objc override dynamic var font: NSFont? {
         didSet {
             clearCache()
         }
     }
-    
+
     @objc override dynamic var textColor: NSColor? {
         didSet {
             clearCache()
         }
     }
-    
+
     private func clearCache() {
         _attrString = nil
         _ctFrame = nil
@@ -55,7 +55,7 @@ class KaraokeLabel: NSTextField {
         needsDisplay = true
         removeProgressAnimation()
     }
-    
+
     private var _attrString: NSAttributedString?
     private var attrString: NSAttributedString {
         if let attrString = _attrString {
@@ -86,7 +86,7 @@ class KaraokeLabel: NSTextField {
         _attrString = attrString
         return attrString
     }
-    
+
     private var _ctFrame: CTFrame?
     private var ctFrame: CTFrame {
         if let ctFrame = _ctFrame {
@@ -102,7 +102,7 @@ class KaraokeLabel: NSTextField {
         _ctFrame = ctFrame
         return ctFrame
     }
-    
+
     override var intrinsicContentSize: NSSize {
         let progression: CTFrameProgression = isVertical ? .rightToLeft : .topToBottom
         let frameAttr: [CTFrame.AttributeKey: Any] = [.progression: progression.rawValue as NSNumber]
@@ -110,7 +110,7 @@ class KaraokeLabel: NSTextField {
         let constraints = CGSize(width: CGFloat.infinity, height: .infinity)
         return framesetter.suggestFrameSize(constraints: constraints, frameAttributes: frameAttr).size
     }
-    
+
     override func draw(_ dirtyRect: NSRect) {
         let context = NSGraphicsContext.current!.cgContext
         context.textMatrix = .identity
@@ -118,9 +118,9 @@ class KaraokeLabel: NSTextField {
         context.scaleBy(x: 1.0, y: -1.0)
         CTFrameDraw(ctFrame, context)
     }
-    
+
     // MARK: - Progress
-    
+
     // TODO: multi-line
     private lazy var progressLayer: CALayer = {
         let pLayer = CALayer()
@@ -128,7 +128,7 @@ class KaraokeLabel: NSTextField {
         layer?.addSublayer(pLayer)
         return pLayer
     }()
-    
+
     @objc dynamic var progressColor: NSColor? {
         get {
             return progressLayer.backgroundColor.flatMap(NSColor.init)
@@ -137,7 +137,7 @@ class KaraokeLabel: NSTextField {
             progressLayer.backgroundColor = newValue?.cgColor
         }
     }
-    
+
     func setProgressAnimation(color: NSColor, progress: [(TimeInterval, Int)]) {
         removeProgressAnimation()
         guard let line = ctFrame.lines.first,
@@ -151,7 +151,7 @@ class KaraokeLabel: NSTextField {
             transform *= .flip(height: bounds.height)
         }
         lineBounds.apply(t: transform)
-        
+
         progressLayer.anchorPoint = isVertical ? CGPoint(x: 0.5, y: 0) : CGPoint(x: 0, y: 0.5)
         progressLayer.frame = lineBounds
         progressLayer.backgroundColor = color.cgColor
@@ -182,13 +182,13 @@ class KaraokeLabel: NSTextField {
         animation.duration = duration
         progressLayer.add(animation, forKey: "inlineProgress")
     }
-    
+
     func pauseProgressAnimation() {
         let pausedTime = progressLayer.convertTime(CACurrentMediaTime(), from: nil)
         progressLayer.speed = 0
         progressLayer.timeOffset = pausedTime
     }
-    
+
     func resumeProgressAnimation() {
         let pausedTime = progressLayer.timeOffset
         progressLayer.speed = 1
@@ -197,7 +197,7 @@ class KaraokeLabel: NSTextField {
         let timeSincePause = progressLayer.convertTime(CACurrentMediaTime(), from: nil) - pausedTime
         progressLayer.beginTime = timeSincePause
     }
-    
+
     func removeProgressAnimation() {
         CATransaction.begin()
         CATransaction.setDisableActions(true)

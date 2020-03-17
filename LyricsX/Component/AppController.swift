@@ -15,11 +15,11 @@ import OpenCC
 import Regex
 
 class AppController: NSObject {
-    
+
     static let shared = AppController()
-    
+
     let lyricsManager = LyricsProviderManager()
-    
+
     @Published var currentLyrics: Lyrics? {
         willSet {
             willChangeValue(forKey: "lyricsOffset")
@@ -30,14 +30,14 @@ class AppController: NSObject {
             scheduleCurrentLineCheck()
         }
     }
-    
+
     @Published var currentLineIndex: Int?
-    
+
     var searchRequest: LyricsSearchRequest?
     var searchCanceller: Cancellable?
-    
+
     private var cancelBag = Set<AnyCancellable>()
-    
+
     @objc dynamic var lyricsOffset: Int {
         get {
             return currentLyrics?.offset ?? 0
@@ -48,7 +48,7 @@ class AppController: NSObject {
             scheduleCurrentLineCheck()
         }
     }
-    
+
     private override init() {
         super.init()
         selectedPlayer.currentTrackWillChange
@@ -61,7 +61,7 @@ class AppController: NSObject {
             .receive(on: DispatchQueue.lyricsDisplay.cx)
             .invoke(AppController.scheduleCurrentLineCheck, weaklyOn: self)
             .store(in: &cancelBag)
-        
+
         defaultNC.cx.publisher(for: NSWorkspace.didTerminateApplicationNotification, object: nil)
             .sink { n in
                 let bundleID = (n.userInfo![NSWorkspace.applicationUserInfoKey] as! NSRunningApplication).bundleIdentifier
@@ -71,7 +71,7 @@ class AppController: NSObject {
             }.store(in: &cancelBag)
         currentTrackChanged()
     }
-    
+
     var currentLineCheckSchedule: Cancellable?
     func scheduleCurrentLineCheck() {
         currentLineCheckSchedule?.cancel()
@@ -91,7 +91,7 @@ class AppController: NSObject {
             }
         }
     }
-    
+
     func writeToiTunes(overwrite: Bool) {
         guard selectedPlayer.name == .appleMusic,
             let currentLyrics = currentLyrics,
@@ -121,7 +121,7 @@ class AppController: NSObject {
         let replaced = content.replacingMatches(of: regex, with: "\n\n")
         sbTrack.setValue(replaced, forKey: "lyrics")
     }
-    
+
     func currentTrackChanged() {
         if currentLyrics?.metadata.needsPersist == true {
             currentLyrics?.persist()
@@ -135,13 +135,13 @@ class AppController: NSObject {
         // FIXME: deal with optional value
         let title = track.title ?? ""
         let artist = track.artist ?? ""
-        
+
         guard !defaults[.noSearchingTrackIds].contains(track.id) else {
             return
         }
-        
+
         var candidateLyricsURL: [(URL, Bool, Bool)] = []  // (fileURL, isSecurityScoped, needsSearching)
-        
+
         if defaults[.loadLyricsBesideTrack] {
             if let fileName = track.fileURL?.deletingPathExtension() {
                 candidateLyricsURL += [
@@ -158,7 +158,7 @@ class AppController: NSObject {
             (fileName.appendingPathExtension("lrcx"), security, false),
             (fileName.appendingPathExtension("lrc"), security, true)
         ]
-        
+
         for (url, security, needsSearching) in candidateLyricsURL {
             if security {
                 guard url.startAccessingSecurityScopedResource() else {
@@ -170,7 +170,7 @@ class AppController: NSObject {
                     url.stopAccessingSecurityScopedResource()
                 }
             }
-            
+
             if let lrcContents = try? String(contentsOf: url, encoding: String.Encoding.utf8),
                 let lyrics = Lyrics(lrcContents) {
                 lyrics.metadata.localURL = url
@@ -187,18 +187,18 @@ class AppController: NSObject {
                 }
             }
         }
-        
+
         #if IS_FOR_MAS
             guard defaults[.isInMASReview] == false else {
                 return
             }
             checkForMASReview()
         #endif
-        
+
         if let album = track.album, defaults[.noSearchingAlbumNames].contains(album) {
             return
         }
-        
+
         let duration = track.duration ?? 0
         let req = LyricsSearchRequest(searchTerm: .info(title: title, artist: artist),
                                       title: title,
@@ -217,9 +217,9 @@ class AppController: NSObject {
             }).cancel(after: .seconds(10), scheduler: DispatchQueue.lyricsDisplay.cx)
         Answers.logCustomEvent(withName: "Search Lyrics Automatically", customAttributes: ["override": currentLyrics == nil ? 0 : 1])
     }
-    
+
     // MARK: LyricsSourceDelegate
-    
+
     func lyricsReceived(lyrics: Lyrics) {
         guard let req = searchRequest,
             lyrics.metadata.request == req else {
@@ -239,7 +239,7 @@ class AppController: NSObject {
 }
 
 extension AppController {
-    
+
     func importLyrics(_ lyricsString: String) throws {
         guard let lrc = Lyrics(lyricsString) else {
             let errorInfo = [
